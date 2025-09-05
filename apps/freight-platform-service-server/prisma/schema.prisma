@@ -1,0 +1,87 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Load {
+  assignments  Assignment[]
+  createdAt    DateTime        @default(now())
+  deliveryDate DateTime?
+  destination  String?
+  details      String?
+  id           String          @id @default(cuid())
+  negotiations Negotiation[]
+  origin       String?
+  pickupDate   DateTime?
+  status       EnumLoadStatus?
+  updatedAt    DateTime        @updatedAt
+  user         User?           @relation(fields: [userId], references: [id])
+  userId       String?
+  weight       Float?
+}
+
+model Negotiation {
+  assignments    Assignment[]
+  createdAt      DateTime               @default(now())
+  id             String                 @id @default(cuid())
+  load           Load?                  @relation(fields: [loadId], references: [id])
+  loadId         String?
+  newAmount      Float?
+  proposedAmount Float?
+  status         EnumNegotiationStatus?
+  updatedAt      DateTime               @updatedAt
+  user           User?                  @relation(fields: [userId], references: [id])
+  userId         String?
+}
+
+model Assignment {
+  createdAt     DateTime              @default(now())
+  finalAmount   Float?
+  id            String                @id @default(cuid())
+  load          Load?                 @relation(fields: [loadId], references: [id])
+  loadId        String?
+  negotiation   Negotiation?          @relation(fields: [negotiationId], references: [id])
+  negotiationId String?
+  status        EnumAssignmentStatus?
+  updatedAt     DateTime              @updatedAt
+  user          User?                 @relation(fields: [userId], references: [id])
+  userId        String?
+}
+
+model User {
+  assignments  Assignment[]
+  companyName  String?
+  createdAt    DateTime          @default(now())
+  email        String?           @unique
+  firstName    String?
+  id           String            @id @default(cuid())
+  lastName     String?
+  loads        Load[]
+  negotiations Negotiation[]
+  password     String
+  phoneNumber  String?
+  roleType     EnumUserRoleType?
+  roles        Json
+  updatedAt    DateTime          @updatedAt
+  username     String            @unique
+}
+
+enum EnumLoadStatus {
+  Option1
+}
+
+enum EnumNegotiationStatus {
+  Option1
+}
+
+enum EnumAssignmentStatus {
+  Option1
+}
+
+enum EnumUserRoleType {
+  Option1
+}
